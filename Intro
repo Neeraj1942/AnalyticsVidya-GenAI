@@ -80,5 +80,16 @@ Bag of Words vectors are easy to interpret. However, TF-IDF usually performs bet
 Main approach : creating a representation for words that capture their meanings, semantic relationships and the different types of contexts they are used in
 
 
+Word Embeddings -
+1. Frequency-based Embedding 
+2. Prediction-based Embedding
+
+ 1. Frequency-based Embedding
+a. Count Vector
+b. TF-IDF Vector
+c. Co-Occurrence Vector
+
+
+
 
 
