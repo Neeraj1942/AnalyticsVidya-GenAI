@@ -116,4 +116,71 @@ lazy	1	2	1	0	0	0
 intelligent	2	2	0	0	0	0
 smart	1	1	0	0	0	0
 
+the whole sentence is considered on line of tokens where, going up and down is counted (window size : 2 - left or right of the line )
+line : He is not lazy. He is intelligent. He is smart
+
+Issues : It requires huge memory to store the co-occurrence matrix.
+
+
+2. Prediction based embeddings ->
+This section assumes that you have a working knowledge of how a neural network works and the mechanisms by which weights in an NN are updated
+
+Word2Vec ->
+
+Word2vec is not a single algorithm but a combination of two techniques – CBOW(Continuous bag of words) and Skip-gram model
+
+softmax example ->
+Input scores:
+[1.0, 2.0, 3.0]
+Exponentiate:
+[e¹, e², e³] ≈ [2.72, 7.39, 20.09]
+Sum:
+2.72 + 7.39 + 20.09 = 30.20
+Normalized:
+[0.09, 0.24, 0.67]
+So softmax outputs:
+~9%, 24%, 67%
+
+CBOW ->
+EX:
+| Input  | Output | Hey | This | is | sample | corpus | using | only | one | context | word |
+| ------ | ------ | --- | ---- | -- | ------ | ------ | ----- | ---- | --- | ------- | ---- |
+| Hey    | this   | 1   | 0    | 0  | 0      | 0      | 0     | 0    | 0   | 0       | 0    |
+| this   | hey    | 0   | 1    | 0  | 0      | 0      | 0     | 0    | 0   | 0       | 0    |
+| is     | this   | 0   | 0    | 1  | 0      | 0      | 0     | 0    | 0   | 0       | 0    |
+| is     | sample | 0   | 0    | 1  | 0      | 0      | 0     | 0    | 0   | 0       | 0    |
+| sample | is     | 0   | 0    | 0  | 1      | 0      | 0     | 0    | 0   | 0       | 0    |
+
+(1*10) * (10*4)  -> INPUT LAYER * WEIGHTS ( CONSIDERING ONLY 1 WORD OR ONE-HOT EMBEDDING) -> STEP1
+STEP1* OUTPUT WEIGHTS (4*10) -> OUTPUT OF (1*10)   
+
+SIMILARLY IF WE HAVE 3 WORDS -> 3*10 MUL WEIGHTS (10*4) -> 3*4 -> THEN THE AVERAGE IS CALCULATED.
+
+
+INPUT WEIGHTS (10*4)
+OUPUT WEIGHTS (4*10)
+AS OUR OUTPUT IS FIXED TO SIZE (1*10)
+
+THIS IS ->
+CBOW takes the average of the context of a word (as seen above in calculation of hidden activation). For example, Apple can be both a fruit and a company but CBOW takes an average of both the contexts and places it in between a cluster for fruits and companies.
+Training a CBOW from scratch can take forever if not properly optimized.
+
+SKIP - GRAM MODEL ->
+WE USE 2 ERROS / OR COMPARE 2 WORDS IN THE SAME CORPUS EX:APPLE , THEN WE GET THE PROBABILTY OF THAT WORD BEING OCCURED IN THE CERTAIN MEANING ?
+| Input | Context1 | Context2  |
+| ----- | -------- | --------- |
+| Hey   | this     | spadding> |
+| this  | Hey      | is        |
+| is    | this     | sample    |
+| ...   | ...      | ...       |
+
+NOTE : Skip-gram predicts multiple context words for each target word (if window size = 2, it predicts 2 context words per target word), 
+but fundamentally it's still one target word at a time
+
+| Model     | Input                  | Output                 |
+| --------- | ---------------------- | ---------------------- |
+| CBOW      | Many **context words** | One **target word**    |
+| Skip-gram | One **target word**    | Many **context words** |
+
+
 
