@@ -89,7 +89,31 @@ a. Count Vector
 b. TF-IDF Vector
 c. Co-Occurrence Vector
 
+a. Count vector ->
+D1: He is a lazy boy. She is also lazy.
+D2: Neeraj is a lazy person.
+The dictionary created may be a list of unique tokens(words) in the corpus =[‘He’,’She’,’lazy’,’boy’,’Neeraj’,’person’]
 
+Here, D=2, N=6
+He	She	lazy	boy	Neeraj	person
+D1	1	1	2	1	0	0
+D2	0	0	1	0	1	1
 
+b. TD-IDF ->
+TF is fraction , IDF is log(N/n) ; N is all documents, and n is times the word appreared in how many documents
+TF-IDF : TF * IDF ; this helps to penalize the most common words like a,an,the,is thye etc , because N/n is always 1 , log(1) =0
+
+c. Co-Occurrence Vector ->
+1. Co-occurence 
+2. Context Window
+
+Corpus = He is not lazy. He is intelligent. He is smart
+ 	He	is	not	lazy	intelligent	smart
+He	0	4	2	1	2	1
+is	4	0	1	2	2	1
+not	2	1	0	1	0	0
+lazy	1	2	1	0	0	0
+intelligent	2	2	0	0	0	0
+smart	1	1	0	0	0	0
 
 
