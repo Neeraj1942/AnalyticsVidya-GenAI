@@ -1,1 +1,84 @@
 This is the learning path for GenAI
+
+Bag of words (BOW) and TF-IDF : Helps convert text sentences to numeric vectors
+
+1. Bag of words (BOW) : 
+example : 
+Review 1: This movie is very scary and long
+Review 2: This movie is not scary and is slow
+Review 3: This movie is spooky and good
+
+the words are -> 11 words: ‘This’, ‘movie’, ‘is’, ‘very’, ‘scary’, ‘and’, ‘long’, ‘not’,  ‘slow’, ‘spooky’,  ‘good’
+https://cdn.analyticsvidhya.com/wp-content/uploads/2020/02/BoWBag-of-Words-model-2.png
+Vector-of-Review1: [1 1 1 1 1 1 1 0 0 0 0]
+Vector-of-Review2: [1 1 2 0 0 1 1 0 1 0 0]
+Vector-of-Review3: [1 1 1 0 0 0 1 0 0 1 1]
+
+Drawbacks ->
+1. If the new sentences contain new words, then our vocabulary size would increase and thereby, the length of the vectors would increase too.
+2. Additionally, the vectors would also contain many 0s, thereby resulting in a sparse matrix (which is what we would like to avoid)
+3. We are retaining no information on the grammar of the sentences nor on the ordering of the words in the text.
+
+Limitations ->
+No Word Order: It doesn’t care about the order of words, missing out on how words work together.
+Ignores Context: It doesn’t understand the meaning of words based on the words around them.
+Always Same Length: It always represents text in the same way, which can be limiting for different types of text.
+Lots of Words: It needs to know every word in a language, which can be a huge list to handle.
+No Meanings: It doesn’t understand what words mean, only how often they appear, so it can’t grasp synonyms or different word forms.
+
+Term frequency - Inverse Document Frequency(TF-IDF) -> is a numerical statistic that is intended to reflect how important a word is to a document in a collection or corpus
+ It is a measure of how frequently a term, t, appears in a document, d: 
+Here, in the numerator, n is the number of times the term “t” appears in the document “d”. Thus, each document and term would have its own TF value.
+
+1. Term Frequency (TF)
+   TF(t, d) = f(t, d) / |d|
+   # f(t, d) = frequency of term t in document d
+   # |d| = total number of terms in document d
+   # Measures how common a term is in a specific document
+
+2. Inverse Document Frequency (IDF)
+   IDF(t) = log(N / df(t))
+   # N = total number of documents in the corpus
+   # df(t) = number of documents containing term t
+   # Measures how rare/informative a term is across the corpus
+   # log is used to dampen the effect of very rare terms
+
+3. TF-IDF
+   TF-IDF(t, d) = TF(t, d) * IDF(t)
+   # Combines local importance (TF) and global rarity (IDF)
+   # Higher TF-IDF → more important term for this document
+
+Example of these steps ->
+TF(‘movie’) = 1/8
+TF(‘is’) = 2/8 = 1/4
+TF(‘very’) = 0/8 = 0
+TF(‘scary’) = 1/8
+TF(‘and’) = 1/8
+TF(‘long’) = 0/8 = 0
+TF(‘not’) = 1/8
+TF(‘slow’) = 1/8
+TF( ‘spooky’) = 0/8 = 0
+TF(‘good’) = 0/8 = 0
+
+IDF(‘movie’, ) = log(3/3) = 0
+IDF(‘is’) = log(3/3) = 0
+IDF(‘not’) = log(3/1) = log(3) = 0.48
+IDF(‘scary’) = log(3/2) = 0.18
+IDF(‘and’) = log(3/3) = 0
+IDF(‘slow’) = log(3/1) = 0.48
+
+TF-IDF(‘movie’, Review 2) = 1/8 * 0 = 0
+TF-IDF(‘is’, Review 2) = 1/4 * 0 = 0
+TF-IDF(‘not’, Review 2) = 1/8 * 0.48 = 0.06
+TF-IDF(‘scary’, Review 2) = 1/8 * 0.18 = 0.023
+TF-IDF(‘and’, Review 2) = 1/8 * 0 = 0
+TF-IDF(‘slow’, Review 2) = 1/8 * 0.48 = 0.06
+
+Bag of Words just creates a set of vectors containing the count of word occurrences in the document (reviews), while the TF-IDF model contains information on the more important words and the less important ones as well.
+Bag of Words vectors are easy to interpret. However, TF-IDF usually performs better in machine learning models.
+
+Main approach : creating a representation for words that capture their meanings, semantic relationships and the different types of contexts they are used in
+
+
+
+
