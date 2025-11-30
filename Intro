@@ -116,6 +116,15 @@ lazy	1	2	1	0	0	0
 intelligent	2	2	0	0	0	0
 smart	1	1	0	0	0	0
 
+example 1 : My friend Neeraj plays cricket daily Neeraj.
+example 2 : He is not lazy. He is intelligent. He is smart
+
+| Example     | Window | Symmetric?            | Count explanation                                                    |
+| ----------- | ------ | --------------------- | -------------------------------------------------------------------- |
+| My & friend | 2      | Symmetric             | My → friend = 1, friend → My = 1 → total = 2                         |
+| He & is     | 2      | Target → context only | He occurs 3 times, context has “is” 4 times → total = 4, not doubled |
+
+
 the whole sentence is considered on line of tokens where, going up and down is counted (window size : 2 - left or right of the line )
 line : He is not lazy. He is intelligent. He is smart
 
@@ -192,5 +201,40 @@ Input (context): I, pizza → Output (target): love
 Skip-gram:
 Input (target): love → Outputs (contexts): I, pizza
 
+
+Important: 
+Input  →  (weights W1)  →  Hidden  →  (weights W2)  →  Output
+
+That’s means -  Word2Vec maintains two matrices—input embeddings and output embeddings. 
+So if 3000 word sin vocab and 100 weights per each word.
+The total parameter is - 3000 * 100 * 2( because one for input and one for output weights
+
+f we have 4 words in a vocab - a b c d
+If we want to only predict c using a 
+Then we use negative sampling, a(1) and the ret is given (0) to avoid the weight of those words. 
+This I turn causes the word2vec to predict less words, example a is used to predict only b and c. 
+So this reduces the time/ weights of d in total which helps a lot/saves time
+
+Working of CWOB ->
+| Step  | What Happens                               | Example for “Neeraj”                             |
+| ----- | ------------------------------------------ | ------------------------------------------------ |
+| **1** | Choose target word                         | **Neeraj**                                       |
+| **2** | Select context words (2 left + 2 right)    | My, friend, plays, cricket                       |
+| **3** | Convert each context word to embeddings    | e(My), e(friend), e(plays), e(cricket)           |
+| **4** | Average the embeddings                     | hidden = avg(all 4 embeddings)                   |
+| **5** | Predict the target word from hidden vector | Model outputs highest probability for **Neeraj** |
+| **6** | Update weights if prediction is wrong      | Improve embeddings for next time                 |
+
+(if we want the embedding size =3 (My → [0.1,0.4,−0.3]) then we have put the activation layer as 3)
+
+Skip -gram :
+| Step  | What Happens                                                         | Example for “Neeraj”                                           |
+| ----- | -------------------------------------------------------------------- | -------------------------------------------------------------- |
+| **1** | Choose **target word**                                               | **Neeraj**                                                     |
+| **2** | Identify **context words** (2 left + 2 right)                        | My, friend, plays, cricket                                     |
+| **3** | Convert **target word** to its embedding                             | e(Neeraj)                                                      |
+| **4** | Use the target embedding to predict **each context word separately** | Predict: My; Predict: friend; Predict: plays; Predict: cricket |
+| **5** | Model outputs probability for each context word                      | Highest probs should match the real context words              |
+| **6** | Update weights if predictions are wrong                              | Improve e(Neeraj) so it predicts its real neighbors            |
 
 
