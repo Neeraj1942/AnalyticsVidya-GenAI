@@ -237,4 +237,14 @@ Skip -gram :
 | **5** | Model outputs probability for each context word                      | Highest probs should match the real context words              |
 | **6** | Update weights if predictions are wrong                              | Improve e(Neeraj) so it predicts its real neighbors            |
 
+Using word2vec pretrained models :
+| Parameter   | Meaning                                     |
+| ----------- | ------------------------------------------- |
+| sentence    | tokenized sentences (list of word lists)    |
+| min_count=1 | include all words, even rare ones           |
+| size=300    | embedding vector length (hidden layer size) |
+| workers=4   | number of CPU threads for training          |
+
+
+
 
