@@ -1,0 +1,56 @@
+types of sentiment analysis -
+
+Fine-grained Sentiment Analysis: This goes beyond just positive, negative, or neutral. It involves very specific ratings, like a 5-star rating, for example.
+Emotion detection: This aims to detect emotions like happiness, frustration, anger, sadness, etc. The biggest challenge here is being able to accurately identify these emotions in text.
+Aspect-based Sentiment Analysis: This is generally used to understand specific aspects of a certain product or service. For example, in a review like “The battery life of this phone is great, but the screen is not very clear”, the sentiment towards the battery life is positive, but it’s negative towards the screen.
+Multilingual sentiment analysis: This can be particularly challenging because the same word can convey different sentiments in different languages.
+Intent Analysis: This goes a step further to understand the user’s intention behind a certain statement. For example, a statement like “I would need a car” might indicate a purchasing intent.
+
+Challenges in Sentiment analysis -
+Sarcasm and Irony
+Contextual Understanding
+Negations and Double Negatives
+Emojis and Slang
+Multilingual Sentiment Analysis
+Aspect-Based Sentiment Analysis
+
+Basic Python Libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from wordcloud import WordCloud
+import re
+
+Natural Language Processing ->
+nltk – Natural Language Toolkit is a collection of libraries for natural language processing
+stopwords – a collection of words that don’t provide any meaning to a sentence
+WordNetLemmatizer – used to convert different forms of words into a single item but still keeping the context intact.
+
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
+Scikit-Learn (Machine Learning Library for Python) ->
+CountVectorizer – transform text to vectors
+GridSearchCV – for hyperparameter tuning
+RandomForestClassifier – machine learning algorithm for classification
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+
+
+Evaluation Metrics ->
+Accuracy Score: no. of correctly classified instances/total no. of instances
+Precision Score: the ratio of correctly predicted instances over total positive instances
+Recall Score: the ratio of correctly predicted instances over total instances in that class
+Roc Curve: a plot of true positive rate against false positive rate
+Classification Report: report of precision, recall and f1 score
+Confusion Matrix: a table used to describe the classification models
+
+from sklearn.metrics import accuracy_score,precision_score,recall_score,confusion_matrix,roc_curve,classification_report
+from scikitplot.metrics import plot_confusion_matrix
+
+
+
+
