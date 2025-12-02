@@ -1,0 +1,27 @@
+RNN ->
+vanishing gradient issue is handled by :
+1. LSTM Long -short-term memory 
+2. GRU Gated Recurrent Unit 
+
+1. LSTM -> 3 gates
+Forget Gate ->
+information from previous hidden states and current state information is passed to sigmoid function. close to 0 means forget, close to 1 means information proceeds forward
+
+Input Gate -> here the information is uopdated, by -> cell state is updated
+
+Output Gate -> egnerates the next hidden state, cell states are carried over to the next time stamp.
+
+2. GRU - 2 gates
+Reset gate -> decides how much past information should be forgotten. resets the past information.
+
+Update gate -> forget gate + input gate ( forget gate : decides what information to ignore amnd what informatin to add to memory)
+
+| Gate                   | What It Does                                                   | Simple Interpretation                      |
+| ---------------------- | -------------------------------------------------------------- | ------------------------------------------ |
+| **Forget Gate (LSTM)** | Removes irrelevant memory from cell state                      | “What should I forget?”                    |
+| **Input Gate (LSTM)**  | Controls how much new information to add                       | “What new info should I store?”            |
+| **Output Gate (LSTM)** | Controls what part of the memory becomes output                | “What should I reveal?”                    |
+| **Update Gate (GRU)**  | Keeps old memory or replaces it with new memory                | “Should I update or keep the old info?”    |
+| **Reset Gate (GRU)**   | Determines how much past info to use when generating candidate | “Should I ignore past info for this step?” |
+
+BI-LSTM Networks -> captures information from both sides. instead of one side as in regular rnn.
