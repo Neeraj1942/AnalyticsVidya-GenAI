@@ -1,0 +1,56 @@
+Transformers: A type of neural network architecture that uses self-attention to process sequences of data efficiently, capturing relationships between elements regardless of their distance.
+LLMs (Large Language Models): Language models built using transformers and trained on massive text corpora to generate, understand, or analyze human-like text.
+
+Architecture of a LLM ->
+The embedding layer converts each word in the input text into a high-dimensional vector representation. These embeddings capture semantic and syntactic information about the words and help the model to understand the context.
+The feedforward layers of Large Language Models have multiple fully connected layers that apply nonlinear transformations to the input embeddings. These layers help the model learn higher-level abstractions from the input text.
+The recurrent layers of LLMs interpret information from the input text sequentially. These layers hold a hidden state that updates at each time step, enabling the model to capture dependencies between words in a sentence.
+The attention mechanism is another important part of LLMs, which allows the model to focus selectively on different parts of the input text. This self-attention helps the model attend to the input text’s most relevant parts and generate more accurate predictions.
+
+Llama 3.1 ->
+!pip install --upgrade transformers
+!pip install --upgrade torch
+!pip install --upgrade huggingface_hub==0.36.0
+
+ hf auth login ( in the terminal)
+
+import transformers
+import torch
+
+# Define the model ID for LLaMA 3.1
+model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+
+# Initialize the text generation pipeline with LLaMA 3.1 model
+llama3 = transformers.pipeline(
+    "text-generation",
+    model=model_id,
+    model_kwargs={"torch_dtype": torch.bfloat16},  # Using bfloat16 for efficient computation
+    device_map="auto",  # Automatically maps model to available GPU or CPU
+)
+
+Create LLaMA 3.1 Completion Access Function
+def get_completion_llama(prompt, model_pipeline=llama3):
+    messages = [{"role": "user", "content": prompt}]
+    response = model_pipeline(
+        messages,
+        max_new_tokens=2000
+    )
+    return response[0]["generated_text"][-1]['content']
+Let’s try out Llama 3.1
+
+
+response = get_completion_llama(prompt='Explain Generative AI in 2 bullet points')
+display(Markdown(response))
+
+or try 
+
+
+
+from transformers import pipeline
+
+model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+llama3 = pipeline(
+    "text-generation",
+    model=model_id,
+    use_auth_token="my token,
+)
