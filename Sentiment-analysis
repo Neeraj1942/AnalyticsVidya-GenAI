@@ -286,7 +286,11 @@ Input statement has Negative Sentiment.
 Input statement has Positive Sentiment.
 
 
-
+A. Sentiment analysis in Python involves using libraries and tools to analyze text data and determine its sentiment. Commonly used libraries include:
+1. NLTK (Natural Language Toolkit): For text processing and classification.
+2. TextBlob: For simple sentiment analysis and text processing.
+3. VADER (Valence Aware Dictionary and sEntiment Reasoner): For analyzing social media texts.
+4. Transformers (Hugging Face): For using pre-trained models to perform sentiment analysis.
 
 
  
