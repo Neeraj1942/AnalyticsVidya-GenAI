@@ -153,9 +153,19 @@ SLM (Specialized Language Models) -> Can outperform LLMs in specific, well-defin
 
 
 
+ATTENTION MECHANISMS ->
+Breaking Down the Input: Let’s say you have a bunch of words (or any kind of data) that you want the computer to understand. First, it breaks down this input into smaller pieces, like individual words.
+Picking Out Important Bits: Then, it looks at these pieces and decides which ones are the most important. It does this by comparing each piece to a question or ‘query’ it has in mind.
+Assigning Importance: Each piece gets a score based on how well it matches the question. The higher the score, the more important that piece is.
+Focusing Attention: After scoring each piece, it figures out how much attention to give to each one. Pieces with higher scores get more attention, while less important ones get less attention.
+Putting It All Together: Finally, it adds up all the pieces, but gives more weight to the important ones. This way, the computer gets a clearer picture of what’s most important in the input.
 
 
-
+We had encoder =decoder model ion 2015 
+2 rnn/lstm -> 
+ChatGPT said:
+We need two models because the encoder reads and understands the entire input sentence, while the decoder uses that understanding to generate the output sentence. 
+One model can’t do both tasks at the same time.
 
 
 
