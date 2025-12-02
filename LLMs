@@ -54,3 +54,116 @@ llama3 = pipeline(
     model=model_id,
     use_auth_token="my token,
 )
+
+
+GPT 4o ->
+import openai
+from IPython.display import HTML, Markdown, display
+openai.api_key = openai_key
+
+def get_completion_gpt(prompt, model="gpt-4o-mini"):
+
+    messages = [{"role": "user", "content": prompt}]
+
+    response = openai.chat.completions.create(
+
+        model=model,
+
+        messages=messages,
+
+        temperature=0.0, # degree of randomness of the model's output
+
+    )
+
+    return response.choices[0].message.content
+
+response = get_completion_gpt(prompt='Explain Generative AI in 2 bullet points')
+display(Markdown(response))
+
+Gemma 2 ->
+Install Necessary Libraries
+
+!pip install -q  -U transformers accelerate bitsandbytes huggingface_hub
+ Import Necessary Libraries
+
+import torch
+
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+Set-up Quantization Configuration
+
+quantization_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_compute_dtype=torch.bfloat16
+)
+Load Tokenizer and Model ->
+
+tokenizer = AutoTokenizer.from_pretrained("google/gemma-2-9b-it", device="cuda")
+
+model = AutoModelForCausalLM.from_pretrained(
+
+    "google/gemma-2-9b-it",
+
+    quantization_config=quantization_config,
+
+    device_map="cuda")
+Prepare Input Text and Tokenize ->
+
+input_text = "For the below sentence extract the names and \
+
+organizations in a json format\nElon Musk is the CEO of SpaceX"
+
+input_ids = tokenizer(input_text, return_tensors="pt").to("cuda")
+Generate Output
+
+outputs = model.generate(**input_ids, max_length = 512)
+Decode and Print Output
+
+print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+
+
+
+Claude 3.5 Sonnet ->
+
+Installation of the Anthropic Python Package
+
+pip install anthropic
+Import the Anthropic Module
+
+import anthropic
+Create an Instance of the Anthropic API Client
+
+client = anthropic.Anthropic(api_key='your_api_key_here')  
+
+# Define a customer support inquiry 
+
+customer_message = "Hi, I need help with resetting my password. Can you guide me?"
+
+# Send the customer support inquiry to the Claude 
+
+model response = client.messages.create( model="claude-3-5-sonnet-20240620", max_tokens=150, messages=[{"role": "user", "content": customer_message}] ) 
+
+# Print the response from the model 
+
+print("AI Response:", response['completion'])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
