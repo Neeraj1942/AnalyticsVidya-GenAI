@@ -149,7 +149,7 @@ model response = client.messages.create( model="claude-3-5-sonnet-20240620", max
 print("AI Response:", response['completion'])
 
 
-
+SLM (Specialized Language Models) -> Can outperform LLMs in specific, well-defined tasks within their domain of expertise.
 
 
 
