@@ -51,6 +51,254 @@ Confusion Matrix: a table used to describe the classification models
 from sklearn.metrics import accuracy_score,precision_score,recall_score,confusion_matrix,roc_curve,classification_report
 from scikitplot.metrics import plot_confusion_matrix
 
+then we code the model ->
+df_train = pd.read_csv("train.txt",delimiter=';',names=['text','label'])
+df_val = pd.read_csv("val.txt",delimiter=';',names=['text','label'])
+
+df = pd.concat([df_train,df_val])
+df.reset_index(inplace=True,drop=True)
+
+print("Shape of the DataFrame:",df.shape)
+print(df.sample(5))
+
+import seaborn as sns 
+sns.countplot(df.label)
+
+def custom_encoder(df):
+    df.replace(to_replace ="surprise", value =1, inplace=True)
+    df.replace(to_replace ="love", value =1, inplace=True)
+    df.replace(to_replace ="joy", value =1, inplace=True)
+    df.replace(to_replace ="fear", value =0, inplace=True)
+    df.replace(to_replace ="anger", value =0, inplace=True)
+    df.replace(to_replace ="sadness", value =0, inplace=True)
+(here we encode manually the 0 and 1 for bad and good respectively)
+
+custom_encoder(df['label'])
+
+sns.countplot(x='label', data=df)
+
+Data Pre-processing ->
+First, we will iterate through each record, and using a regular expression, we will get rid of any characters apart from alphabets.
+Then, we will convert the string to lowercase as, the word “Good” is different from the word “good”.
+Because, without converting to lowercase, it will cause an issue when we will create vectors of these words, as two different vectors will be created for the same word which we don’t want to.
+Then we will check for stopwords in the data and get rid of them. Stopwords are commonly used words in a sentence such as “the”, “an”, “to” etc. which do not add much value.
+Then, we will perform lemmatization on each word,i.e. change the different forms of a word into a single item called a lemma.
+
+A lemma is a base form of a word. For example, “run”, “running” and “runs” are all forms of the same lexeme, where the “run” is the lemma.
+
+#object of WordNetLemmatizer
+lm = WordNetLemmatizer()
+
+import re
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+lm = WordNetLemmatizer()
+def text_transformation(df_col):
+    corpus = []
+    for item in df_col:
+        new_item = re.sub('[^a-zA-Z]',' ',str(item))
+        new_item = new_item.lower()
+        new_item = new_item.split()
+        new_item = [lm.lemmatize(word) for word in new_item if word not in set(stopwords.words('english'))]
+        corpus.append(' '.join(str(x) for x in new_item))
+    return corpus
+(preprocesing the data using stopwords and lemmetizer also)
+
+corpus = text_transformation(df['text']) ( to apply the preprocessing steps to our text column)
+
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+
+plt.rcParams['figure.figsize'] = 20,8
+word_cloud = ""
+for row in corpus:
+    for word in row:
+        word_cloud+=" ".join(word)
+wordcloud = WordCloud(width = 1000, height = 500,background_color ='white',min_font_size = 10).generate(word_cloud)
+plt.imshow(wordcloud)
+(using matplot lib + wordcloud to represent the data , to show which words are repeated more times and have higher importance )
+
+cv = CountVectorizer(ngram_range=(1,2)) traindata = cv.fit_transform(corpus) X = traindata y = df.label
+(using ngrams as 1,2 means ->
+ext: "I love coding"
+Unigrams (1-gram): "I", "love", "coding"
+Bigrams (2-gram): "I love", "love coding"
+CountVectorizer(ngram_range=(1,2)) will create a feature for all 5 of these.)
+
+then we use
+cv = CountVectorizer(ngram_range=(1,2))
+traindata = cv.fit_transform(corpus)
+X = traindata
+y = df.label
+(fit -> to learn from the patternsobserved in the countvectorizer, and tranform to convert to numerical data)
+(corpus = text_transformation(df['text']) , we already know the corpus refers to the text column)
+
+ the machine learning model creation part and in this project, I’m going to use Random Forest Classifier, 
+and we will tune the hyperparameters using GridSearchCV.
+
+GridSearchCV() will take the following parameters ->
+Estimator or model: RandomForestClassifier in our case
+parameter: dictionary of hyperparameter names and their values
+cv: signifies cross-validation folds
+return_train_score: returns the training scores of the various models
+n_jobs: no. of jobs to run parallelly (“-1” signifies that all CPU cores will be used which reduces the training time drastically)
+
+parameters = {'max_features': ('auto','sqrt'),
+             'n_estimators': [500, 1000, 1500],
+             'max_depth': [5, 10, None],
+             'min_samples_split': [5, 10, 15],
+             'min_samples_leaf': [1, 2, 5, 10],
+             'bootstrap': [True, False]}
+
+| Parameter           | Values / Example      | Meaning (very short)                                |
+| ------------------- | --------------------- | --------------------------------------------------- |
+| `max_features`      | `'auto'`, `'sqrt'`    | Number of features considered for each split        |
+| `n_estimators`      | `500`, `1000`, `1500` | Number of trees in the forest                       |
+| `max_depth`         | `5`, `10`, `None`     | Maximum depth of each tree (`None` = unlimited)     |
+| `min_samples_split` | `5`, `10`, `15`       | Minimum samples required to split a node            |
+| `min_samples_leaf`  | `1`, `2`, `5`, `10`   | Minimum samples required at a leaf node             |
+| `bootstrap`         | `True`, `False`       | Whether to use bootstrap samples for building trees |
+
+'auto' → always use all info → trees more similar ( all the features in each split)
+'sqrt' → limited features → trees more diverse → Random Forest works better ( not all the featurs in eachsplit)
+( all the other are the options , an the model will check each possible case and use the best case)
+(meaning in these few cases only 2/3 , x/3 are considered in stead of considering all the 3 everytime)
+
+Bootstrap = True adds randomness → each tree sees slightly different data → trees are less correlated → ensemble performs better.
+Bootstrap = False → all trees see the same data → trees are more similar → less ensemble gain.
+
+Dataset: [A, B, C, D, E]
+
+Bootstrap=True, sample with replacement (size = 5):
+Tree1 sees: [B, A, C, A, E]
+Tree2 sees: [D, B, E, C, C]
+Tree3 sees: [A, E, B, B, D]
+
+Bootstrap=False:
+Tree1 sees: [A, B, C, D, E]
+Tree2 sees: [A, B, C, D, E]
+Tree3 sees: [A, B, C, D, E]
+
+
+then we use the gridsearchcv ->
+grid_search = GridSearchCV(
+    RandomForestClassifier(),  # Model
+    parameters,                # Hyperparameter grid
+    cv=5,                      # 5-fold cross-validation
+    return_train_score=True,   # Keep train scores too
+    n_jobs=-1                  # Use all CPU cores
+)
+grid_search.fit(X, y)          # Train the grid search
+grid_search.best_params_       # Best combination of parameters
+
+we get the best parameters by using the fridsearchcv ->
+for i in range(432):
+    print('Parameters: ',grid_search.cv_results_['params'][i])
+    print('Mean Test Score: ',grid_search.cv_results_['mean_test_score'][i])
+    print('Rank: ',grid_search.cv_results_['rank_test_score'][i])
+
+2 * 3 * 3 * 3 * 4 * 2 = 432 ( options we gave)
+
+Implementing the RandomForestClassifier model ->
+rfc = RandomForestClassifier(max_features=grid_search.best_params_['max_features'],                                 
+                            max_depth=grid_search.best_params_['max_depth'],
+                            n_estimators=grid_search.best_params_['n_estimators'],                                      min_samples_split=grid_search.best_params_['min_samples_split'],                                   
+                            min_samples_leaf=grid_search.best_params_['min_samples_leaf'],
+                            bootstrap=grid_search.best_params_['bootstrap'])
+rfc.fit(X,y)
+
+test_df = pd.read_csv('test.txt',delimiter=';',names=['text','label'])
+
+# then we preprocess and test data and apply all the tranformation used  and predict it
+X_test,y_test = test_df.text,test_df.label
+#encode the labels into two classes , 0 and 1
+test_df = custom_encoder(y_test)
+#pre-processing of text
+test_corpus = text_transformation(X_test)
+#convert text data into vectors
+testdata = cv.transform(test_corpus)
+#predict the target
+predictions = rfc.predict(testdata)
+(using the test data with all the transformation done similarly in the train also)
+
+import matplotlib.pyplot as plt
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    classification_report,
+    ConfusionMatrixDisplay  
+)
+(importing metrics to calculate accuracy)
+
+
+#plotting all the eavaluations we got
+plt.rcParams['figure.figsize'] = 10,5
+#plt.plot_confusion_matrix(y_test,predictions)
+ConfusionMatrixDisplay.from_predictions(y_test, predictions)
+acc_score = accuracy_score(y_test,predictions)
+pre_score = precision_score(y_test,predictions)
+rec_score = recall_score(y_test,predictions)
+print('Accuracy_score: ',acc_score)
+print('Precision_score: ',pre_score)
+print('Recall_score: ',rec_score)
+print("-"*50)
+cr = classification_report(y_test,predictions)
+print(cr)
+
+(calculating the scores, and the confusion matrix)
+
+from sklearn.metrics import roc_curve
+predictions_probability = rfc.predict_proba(testdata)
+fpr,tpr,thresholds = roc_curve(y_test,predictions_probability[:,1])
+plt.plot(fpr,tpr)
+plt.plot([0,1])
+plt.title('ROC Curve')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.show()
+(plotting the roc-curve)
+
+further we can call the model on other prediction self ones , to check if the model is working fine
+
+def expression_check(prediction_input):
+    if prediction_input == 0:
+        print("Input statement has Negative Sentiment.")
+    elif prediction_input == 1:
+        print("Input statement has Positive Sentiment.")
+    else:
+        print("Invalid Statement.")
+
+def sentiment_predictor(input):
+    input = text_transformation(input)
+    transformed_input = cv.transform(input)
+    prediction = rfc.predict(transformed_input)
+    expression_check(prediction)
+
+input1 = ["Sometimes I just want to punch someone in the face."]
+input2 = ["I bought a new phone and it's so good."]
+
+sentiment_predictor(input1)
+sentiment_predictor(input2)
+
+the ouput is :
+Input statement has Negative Sentiment.
+Input statement has Positive Sentiment.
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
 
 
 
