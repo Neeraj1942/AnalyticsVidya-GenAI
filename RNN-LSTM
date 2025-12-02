@@ -25,3 +25,105 @@ Update gate -> forget gate + input gate ( forget gate : decides what information
 | **Reset Gate (GRU)**   | Determines how much past info to use when generating candidate | “Should I ignore past info for this step?” |
 
 BI-LSTM Networks -> captures information from both sides. instead of one side as in regular rnn.
+
+code ->
+import numpy as np
+from keras.models import Sequential
+from keras.preprocessing import sequence
+from keras.layers import Dropout
+from keras.layers import  Dense, Embedding, LSTM, Bidirectional
+
+from keras.datasets import imdb
+(x_train, y_train),(x_test, y_test) = imdb.load_data(num_words=10000) ( total number of words considred from the whole  corpus is 10000)
+
+max_len = 200
+x_train = sequence.pad_sequences(x_train, maxlen=max_len)
+x_test = sequence.pad_sequences(x_test, maxlen=max_len)
+y_test = np.array(y_test)
+y_train = np.array(y_train)
+
+(each review is padded as 200 words only, not more if more then removed, if less then 0 are added)
+
+model ->
+n_unique_words = 10000
+maxlen = 200
+model = Sequential()
+model.add(Embedding(n_unique_words, 128, input_length=maxlen))
+model.add(Bidirectional(LSTM(64)))
+model.add(Dropout(0.5))
+model.add(Dense(1, activation='sigmoid'))
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+(there are total 10000 words , each embedded as 128 dimnsion vector, so the paramteres are 10000 * 128 , vocab size * 128(dimension vector)
+
+An LSTM has 4 sets of weights, one for each gate:
+Forget gate
+Input gate
+Output gate
+Candidate memory
+
+Add input_dim + hidden_dim: 128 + 64 = 192
+
+Multiply by hidden_dim: 192 × 64 = 12,288
+
+Add hidden_dim (for biases): 12,288 + 64 = 12,352
+
+Multiply by 4 (for 4 gates):  12,352 × 4 = 49,408
+
+| Attribute                            | Description / Value                                                                                             |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| **Layer Type**                       | Bidirectional LSTM                                                                                              |
+| **Input Shape**                      | (batch_size, sequence_length, embedding_dim) = (200, 200, 128)                                                  |
+| **LSTM Units (per direction)**       | 64                                                                                                              |
+| **Output Shape**                     | (batch_size, hidden_dim * 2) = (200, 128)                                                                       |
+| **Number of Gates**                  | 4 per LSTM direction (Forget, Input, Output, Candidate)                                                         |
+| **Weights per Gate**                 | Input weights: 128 × 64 = 8,192 <br> Hidden weights: 64 × 64 = 4,096 <br> Bias: 64 <br> Total per gate = 12,352 |
+| **Parameters per LSTM direction**    | 12,352 × 4 gates = 49,408                                                                                       |
+| **Total Parameters (Bidirectional)** | 49,408 × 2 directions = 98,816                                                                                  |
+| **Notes**                            | Output dimension doubled due to forward + backward processing; captures context from both directions            |
+
+This is why you see input_dim + hidden_dim in the formula — because each gate receives contributions from both the current input and the previous hidden state.
+
+| Component                          | Function                                                             |
+| ---------------------------------- | -------------------------------------------------------------------- |
+| **Forget gate (f_t)**              | Decides what previous memory to forget                               |
+| **Input gate (i_t)**               | Decides what new information to add                                  |
+| **Candidate memory (\tilde{C}_t)** | Generates the “new candidate info” to possibly add to the cell state |
+| **Output gate (o_t)**              | Decides what part of the cell state to output as hidden state        |
+
+
+history=model.fit(x_train, y_train,
+           batch_size=200,
+           epochs=12,
+           validation_data=[x_test, y_test])
+print(history.history['loss'])
+print(history.history['accuracy'])     
+(implementing the model)
+
+plotting the model ->
+from matplotlib import pyplot
+pyplot.plot(history.history['loss'])
+pyplot.plot(history.history['accuracy'])
+pyplot.title('model loss vs accuracy')
+pyplot.xlabel('epoch')
+pyplot.legend(['loss', 'accuracy'], loc='upper right')
+pyplot.show()
+
+
+example ->
+[[0 1 2 3 4 5]
+ [0 0 2 3 4 0]
+ [0 1 5 6 7 0]
+ [3 4 5 6 7 8]]  -> corpus
+
+vocab_size = 10, embedding_dim = 8 
+
+| Layer (Type)           | Output Shape | Parameters | Notes                                                  |
+| ---------------------- | ------------ | ---------- | ------------------------------------------------------ |
+| **Embedding**          | (6, 8)       | 80         | `vocab_size=10`, `embedding_dim=8`                     |
+| **Bidirectional LSTM** | (8,)         | 416        | `hidden_units=4` per direction; 4 gates × weights+bias |
+| **Dropout**            | (8,)         | 0          | 20% dropout, no learnable params                       |
+| **Dense (1)**          | (1,)         | 9          | Fully connected, outputs probability                   |
+| **Total**              | -            | **505**    | Sum of all learnable parameters                        |
+
+
