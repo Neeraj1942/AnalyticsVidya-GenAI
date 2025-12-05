@@ -1,0 +1,15 @@
+Large language Model -> models that use deep learning techniques and have a large number of parameters
+Autoregressive Models: These models generate text one token at a time based on the previously generated tokens. Examples include OpenAI’s GPT series and Google’s BERT.
+Conditional Generative Models: These models generate text conditioned on some input, such as a prompt or context. They are often used in applications like text completion and text generation with specific attributes or styles.
+
+How are they built -> These models are trained on vast amounts of text data from sources such as books, articles, websites, and numerous other forms of written content
+Provided as a service over an API or web interface.
+
+Transformer -> transformers are a type of deep learning model designed to handle sequential data, like text, by using a mechanism called self-attention. 
+They can understand context and relationships between words or elements in a sequence, making them very effective for tasks like language translation, text generation, and summarization.
+
+The embedding layer converts each word in the input text into a high-dimensional vector representation. These embeddings capture semantic and syntactic information about the words and help the model to understand the context.
+The feedforward layers of Large Language Models have multiple fully connected layers that apply nonlinear transformations to the input embeddings. These layers help the model learn higher-level abstractions from the input text.
+The recurrent layers of LLMs interpret information from the input text sequentially. These layers hold a hidden state that updates at each time step, enabling the model to capture dependencies between words in a sentence.
+The attention mechanism is another important part of LLMs, which allows the model to focus selectively on different parts of the input text. This self-attention helps the model attend to the input text’s most relevant parts and generate more accurate predictions.
+
