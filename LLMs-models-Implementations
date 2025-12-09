@@ -1,6 +1,28 @@
 Transformers: A type of neural network architecture that uses self-attention to process sequences of data efficiently, capturing relationships between elements regardless of their distance.
 LLMs (Large Language Models): Language models built using transformers and trained on massive text corpora to generate, understand, or analyze human-like text.
 
+Chinchilla Scaling Law :
+Law : smaller models can outperform larger ones if they are trained on more data.Other models like Gopher, GPT-3, and MT-NLG 530B have significantly more parameters but were trained on relatively fewer tokens, suggesting that these models may not have fully optimized their compute potential.
+
+Model Size (N): The number of parameters in the model.
+Training Tokens (D): The total number of tokens used during training.
+Computational Cost (C): The total compute resources allocated for training, usually measured in FLOPs (floating point operations per second).
+
+(Conclusion of Chinchilla showed that smaller models trained on more data outperform larger models trained on less data.)
+
+GGUF → the model file itself
+GGML → the library that reads the model and runs it on CPU efficiently
+
+GGUF - GGML Unified Format - A model file format used to store LLM weights, configuration, and metadata in one unified, ready-to-load file.
+GGML - Georgi’s General Matrix Library - A lightweight CPU inference library optimized for running LLMs efficiently, especially with quantized weights.
+
+GGUF is a standardized, inference-ready model file (weights + config + metadata,
+Python checkpoints (.pt / .pth) are PyTorch files mainly for training/fine-tuning that store raw weights and optionally optimizer states.
+
+TPU = Tensor Processing Uni
+PUs < GPUs < TPUs in deep learning performance.
+
+
 Architecture of a LLM ->
 The embedding layer converts each word in the input text into a high-dimensional vector representation. These embeddings capture semantic and syntactic information about the words and help the model to understand the context.
 The feedforward layers of Large Language Models have multiple fully connected layers that apply nonlinear transformations to the input embeddings. These layers help the model learn higher-level abstractions from the input text.
