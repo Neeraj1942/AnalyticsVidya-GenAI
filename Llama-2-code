@@ -1,0 +1,84 @@
+!pip install -q transformers einops accelerate langchain bitsandbytes
+
+from langchain_community.llms import HuggingFacePipeline
+from transformers import AutoTokenizer
+import transformers
+import torch
+
+model = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+
+tokenizer = AutoTokenizer.from_pretrained(model)
+
+pipeline = transformers.pipeline(
+    "text-generation", 
+    model=model,
+    tokenizer=tokenizer,
+    torch_dtype=torch.bfloat16,
+    trust_remote_code=True,
+    device_map="auto",
+    max_length=1000,
+    eos_token_id=tokenizer.eos_token_id
+)
+
+llm = HuggingFacePipeline(pipeline = pipeline, model_kwargs = {'temperature':0})
+
+from langchain.prompts import PromptTemplate
+
+template = """
+              You are an intelligent chatbot that gives out useful information to humans.
+              You return the responses in sentences with arrows at the start of each sentence
+              {query}
+           """
+
+prompt = PromptTemplate(template=template, input_variables=["query"])
+
+# Use LCEL syntax (modern LangChain approach)
+llm_chain = prompt | llm
+
+print(llm_chain.invoke({'query': 'What are the 3 causes of glacier meltdowns?'}))
+
+
+
+Explanation -> 
+1. imports and model specified 
+2. the pipeline explained ->
+| Parameter                             | Explanation                                                                                              |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `"text-generation"`                   | Tells the pipeline you want to **generate text**.                                                        |
+| `model=model`                         | The HuggingFace model to use (Meta-LLaMA 3.1 8B).                                                        |
+| `tokenizer=tokenizer`                 | Use the tokenizer we loaded for text↔token conversion.                                                   |
+| `torch_dtype=torch.bfloat16`          | Use **bfloat16 precision**, which saves memory and speeds up computation on compatible GPUs (like A100). |
+| `trust_remote_code=True`              | Some HuggingFace models require **custom code from the model repository**. This allows it.               |
+| `device_map="auto"`                   | Automatically decides whether to put the model on **GPU or CPU**. Useful for very large models.          |
+| `max_length=1000`                     | Maximum number of tokens the model can generate.                                                         |
+| `eos_token_id=tokenizer.eos_token_id` | Defines the **end-of-sequence token**, so the model knows when to stop generating.                       |
+
+3. Specifying the hugginfacepipeline and the temperature ->
+| **Parameter**  | **Description**                                                | **Example / Notes**                                                                                          |
+| -------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `pipeline`     | The HuggingFace text-generation pipeline to use                | `pipeline` created earlier using `transformers.pipeline("text-generation", model=..., ...)`                  |
+| `model_kwargs` | Extra keyword arguments passed to the model at generation time | `{'temperature': 0}`                                                                                         |
+| `temperature`  | Controls randomness of the model output                        | `0` → deterministic (same input → same output), `0.7` → slightly creative, `1.0` → more diverse              |
+| `llm`          | The resulting LangChain LLM object                             | Can now be used like any LangChain LLM: `llm("Prompt text")`                                                 |
+| Output         | The response from the LLM                                      | A **plain string**, e.g., `"Artificial intelligence is the simulation of human intelligence by machines..."` |
+
+4. The question, or template is specified
+
+5. the use of the template ->
+| **Parameter / Object** | **Description**                                                              | **Example / Notes**                                                                    |
+| ---------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `PromptTemplate`       | A LangChain class used to define **templates for prompts** with placeholders | Part of `langchain.prompts`                                                            |
+| `template`             | The **string template** for the prompt, with placeholders for variables      | Example: `"Answer the following question: {query}"`                                    |
+| `input_variables`      | A **list of variable names** used in the template                            | `["query"]` tells LangChain that `{query}` in the template will be replaced at runtime |
+| `prompt`               | The resulting **PromptTemplate object**                                      | Can be used with an LLM to generate text: `llm(prompt.format(query="What is AI?"))`    |
+| Output                 | A **filled prompt string**                                                   | `"Answer the following question: What is AI?"` when `query="What is AI?"`              |
+
+6. using the moel and answering the template/question ->
+| **Line / Object**                                        | **Description**                                                                              | **Example / Notes**                                                                                                                     |                                                      |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `prompt                                                  | llm`                                                                                         | The **LCEL (LangChain Expression Language) syntax**. Combines a **PromptTemplate** (`prompt`) with an **LLM** (`llm`) into a **chain**. | This creates a `LLMChain`-like object automatically. |
+| `llm_chain`                                              | The resulting **chain object** that can take input variables and produce output from the LLM | Works like a function: you pass the variables (here `query`) and get the model’s text response.                                         |                                                      |
+| `.invoke({'query': ...})`                                | Method to **run the chain** with given input variables                                       | Input is a **dictionary** mapping variable names to values. In this case, `query` matches `input_variables` in the `PromptTemplate`.    |                                                      |
+| `'query': 'What are the 3 causes of glacier meltdowns?'` | The **actual input** replacing `{query}` in the prompt template                              | The LLM will receive: `"Answer the following question: What are the 3 causes of glacier meltdowns?"`                                    |                                                      |
+| `print(...)`                                             | Displays the output returned by the LLM                                                      | Outputs the model’s text, e.g., `"The three main causes of glacier meltdowns are: 1. Global warming ..."`                               |                                                      |
+
