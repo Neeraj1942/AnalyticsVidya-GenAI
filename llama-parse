@@ -1,1 +1,43 @@
 llama parse api key : llx-WMb0ZICQvgzENjtam48LVvOGMObE7aIr7qWYOPPqwO2u5W4U
+openApi key : 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
+
+from llama_index.llms.openai import OpenAI
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.core import Settings
+from llama_parse import LlamaParse
+from llama_index.core.node_parser import MarkdownElementNodeParser
+from llama_index.core import VectorStoreIndex
+
+embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+llm = OpenAI(model="gpt-3.5-turbo-0125")
+
+Settings.llm = llm
+Settings.embed_model = embed_model
+
+documents = LlamaParse(result_type="markdown").load_data("./Table_2021.pdf")
+
+node_parser = MarkdownElementNodeParser(
+    llm=llm, num_workers=8
+)
+
+nodes = node_parser.get_nodes_from_documents(documents)
+
+base_nodes, objects = node_parser.get_nodes_and_objects(nodes)
+
+recursive_index = VectorStoreIndex(nodes=base_nodes + objects)
+
+recursive_query_engine = recursive_index.as_query_engine(
+    similarity_top_k=5
+)
+
+query = 'Extract the table as a dict and exclude any information about 2020. Also include % var'
+response = recursive_query_engine.query(query)
+print(response)
+
+
+
+Explanation of the code ->
+This code uses LlamaParse to extract and structure the PDF table into nodes.
+It then builds a vector index and uses ChatGPT (via OpenAI LLM) to query the index and interpret the data.
+Finally, it extracts the table as a dictionary with filters (e.g., excluding 2020, including % change) and prints it.
+
